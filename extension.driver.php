@@ -16,7 +16,7 @@
 				'description' => 'Adds a hook to the backend so you can easily make JavaScript adjustments on certain pages'
 			);
 		}
-		
+
 		/**
 		* Set the delegates
 		*/
@@ -30,7 +30,7 @@
 				)
 			);
 		}
-		
+
 		/**
 		 * Add script to the <head>-section of the admin area
 		 */
@@ -39,26 +39,32 @@
 			// We have to put a lot of javascript here since there are missing some handles:
 			$javaScript = "\n";
 			$callback   = Administration::instance()->getPageCallback();
-			
+
 			// Current callback and action:
 			$driver = '"'.$callback['driver'].'"';
 			$action = isset($callback['context']['page']) ? '"'.$callback['context']['page'].'"' : 'false';
 			$section= isset($callback['context']['section_handle']) ? '"'.$callback['context']['section_handle'].'"' : 'false';
 			$idEntry= isset($callback['context']['entry_id']) ? '"'.$callback['context']['entry_id'].'"' : 'false';
-			
+
 			// User information:
-			$javaScript.= "var user_id   = ".Administration::instance()->Author->get('id').";\n";
-			$javaScript.= "var user_type = '".Administration::instance()->Author->get('user_type')."';\n";
+	        if (is_callable(array('Symphony', 'Author'))) {
+	            $author = Symphony::Author();
+	        } else {
+	            $author = Administration::instance()->Author;
+	        }
+
+			$javaScript.= "var user_id   = ".$author->get('id').";\n";
+			$javaScript.= "var user_type = '".$author->get('user_type')."';\n";
 			$javaScript.= "var driver    = ".$driver.";\n";
 			$javaScript.= "var action    = ".$action.";\n";
 			$javaScript.= "var section   = ".$section.";\n";
 			$javaScript.= "var id_entry  = ".$idEntry.";\n";
-			
+
 			$tag = new XMLElement('script', $javaScript, array('type'=>'text/javascript'));
 
             Administration::instance()->Page->addElementToHead($tag);
             Administration::instance()->Page->addScriptToHead(URL.'/extensions/backend_add_script/assets/custom.js');
             Administration::instance()->Page->addStylesheetToHead(URL.'/extensions/backend_add_script/assets/custom.css');
-		}	
+		}
 	}
 ?>
